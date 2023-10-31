@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/node";
+import { Link } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -20,8 +21,11 @@ export default function Index() {
       </div>
       <div>
         <h2 className="m-5 text-4xl font-bold">Featured</h2>
-        <div className="container mx-10 w-96 rounded bg-slate-400">
-          <p>Thang</p>
+        <div className="container mx-10 w-96 rounded p-5 bg-slate-400">
+          <h2 className="text-2xl font-semibold">Game</h2>
+          <img src="/asa.jpg" alt="game" />
+          <p className="text-xl mt-5">£37.99</p>
+          <Link to="/asa" className="mt-2 mb-2 text-blue-600 underline text-xl">Go to product page&gt;</Link>
         </div>
       </div>
     </main>
