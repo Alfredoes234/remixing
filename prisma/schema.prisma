@@ -7,14 +7,16 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = env("DEV_DATABASE_URL") /// Change this depending on the environment
+  url      = env("PROD_DATABASE_URL") /// Change this depending on the environment
   relationMode = "prisma"
 }
 
 model user {
   id   Int   @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   email String @unique
-  password String 
+  password String
   name String?
   cookie String?
 }

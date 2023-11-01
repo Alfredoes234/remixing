@@ -9,8 +9,9 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import MainNav from "./components/navigation";
+
 import Footer from "./components/foot";
+import Nav from "./components/navigation";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -27,13 +28,9 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <nav>
-          <MainNav />
-        </nav>
+        <Nav />
         <Outlet />
-        <footer>
-          <Footer />
-        </footer>
+        <Footer />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
