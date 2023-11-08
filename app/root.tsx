@@ -5,13 +5,11 @@ import {
   Links,
   LiveReload,
   Meta,
+  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-
-import Footer from "./components/foot";
-import Nav from "./components/navigation";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
@@ -28,9 +26,22 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Nav />
+        <nav className="flex justify-between m-5">
+          <div>
+            <NavLink to="/" prefetch="intent" className="text-4xl font-bold" >Logo</NavLink>
+          </div>
+          <div className="flex gap-5 text-2xl">
+            <NavLink to="/" prefetch="intent" >cart</NavLink>
+            <NavLink to="/signup" prefetch="intent" >signup</NavLink>
+          </div>
+        </nav>
         <Outlet />
-        <Footer />
+        <footer className="bg-gray-400 mt-5 p-5">
+          <p className="text-4xl">WoW</p>
+          <div>
+            <p>Canca</p>
+          </div>
+        </footer>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
