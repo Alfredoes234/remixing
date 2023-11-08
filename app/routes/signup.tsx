@@ -1,5 +1,6 @@
 import { redirect, type ActionFunctionArgs, json } from "@remix-run/node";
 import { prisma } from "~/lib/prisma.server";
+import { Prisma as pris} from "@prisma/client";
 import { z } from "zod";
 import { Form, useActionData } from "@remix-run/react";
 
@@ -19,13 +20,27 @@ export async function action({
     if (!result.success) {
         return json({ error: result.error.format() });
     } 
-
-    await prisma.user.create({
-        data: result.data
-    })
     
-    return redirect("/")
+    try {
+        await prisma.user.create({
+            data: result.data
+        })  
+    } catch (e: any) {
+        if (e instanceof pris.PrismaClientKnownRequestError) {
+            // The .code property can be accessed in a type-safe manner
+            if (e.code === 'P2002') {
+                console.error(
+                    'There is a unique constraint violation, a new user cannot be created with this email'
+                )
+            }
+        }
+    }
+    
+    
+    return redirect("/signup")
 }
+
+
 
 export default function Signup() {
     const data = useActionData<typeof action>();
