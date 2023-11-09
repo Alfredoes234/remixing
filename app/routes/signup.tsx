@@ -1,6 +1,6 @@
 import { redirect, type ActionFunctionArgs, json } from "@remix-run/node";
 import { prisma } from "~/lib/prisma.server";
-import { Prisma as pris} from "@prisma/client";
+import { Prisma as pris } from "@prisma/client";
 import { z } from "zod";
 import { Form, useActionData } from "@remix-run/react";
 
@@ -16,28 +16,27 @@ export async function action({
     const formData = await request.formData();
     const body = Object.fromEntries(formData.entries());
     const result = await signupSchema.safeParseAsync(body);
-    
+
     if (!result.success) {
+        console.log(result.error.format())
         return json({ error: result.error.format() });
-    } 
-    
+    }
+
     try {
         await prisma.user.create({
             data: result.data
-        })  
+        })
     } catch (e: any) {
         if (e instanceof pris.PrismaClientKnownRequestError) {
             // The .code property can be accessed in a type-safe manner
             if (e.code === 'P2002') {
                 // Replace console log with custom json error (try & reconstruct with same format as zod error)
-                console.error(
-                    'There is a unique constraint violation, a new user cannot be created with this email'
-                )
+                const mssg = 'Email taken'
+                return json({ error: { email: { _errors: [mssg] } } });
             }
         }
     }
-    
-    
+
     return redirect("/signup")
 }
 
@@ -45,6 +44,7 @@ export async function action({
 
 export default function Signup() {
     const data = useActionData<typeof action>();
+    // Error complains that its not good with the return for message up above but it works
     return (
         <Form preventScrollReset method="POST" className="m-5">
             <div>
@@ -56,7 +56,7 @@ export default function Signup() {
                 {data && data.error.email && <p className="ml-2 text-red-600">{data.error.email._errors[0]}</p>}
             </div>
             <div>
-                <input type="password" name="password" id="password" placeholder="  Password"  className="border-black m-2 rounded border" />
+                <input type="password" name="password" id="password" placeholder="  Password" className="border-black m-2 rounded border" />
                 {data && data.error.password && <p className="ml-2 text-red-600">{data.error.password._errors[0]}</p>}
             </div>
             <button type="submit" className="bg-cyan-400 m-2 rounded px-4 py-2">Sign Up</button>
