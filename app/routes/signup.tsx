@@ -29,6 +29,7 @@ export async function action({
         if (e instanceof pris.PrismaClientKnownRequestError) {
             // The .code property can be accessed in a type-safe manner
             if (e.code === 'P2002') {
+                // Replace console log with custom json error (try & reconstruct with same format as zod error)
                 console.error(
                     'There is a unique constraint violation, a new user cannot be created with this email'
                 )
