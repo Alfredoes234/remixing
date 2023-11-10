@@ -1,13 +1,6 @@
 import {  scryptAsync } from '@noble/hashes/scrypt';
-import { z } from "zod";
 import { bytesToHex as toHex, randomBytes } from '@noble/hashes/utils';
 import { timingSafeEqual } from 'crypto';
-
-export const signupSchema = z.object({
-    name: z.string().min(1).max(8).trim(),
-    email: z.string().email().trim(),
-    password: z.string().min(5).max(12).trim()
-});
 
 async function Hash(password: Uint8Array | string) {
     const salt = toHex(randomBytes(16));

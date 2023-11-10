@@ -16,11 +16,15 @@ export async function action({
 }: ActionFunctionArgs) {
     const formData = await request.formData();
     const body = Object.fromEntries(formData.entries());
+    // Validates it against the zod schema
     const result = await signupSchema.safeParseAsync(body);
 
     if (!result.success) {
         return json({ error: result.error.format() });
     }
+
+    // Gets the validated password & proceeds to hash it
+    result.data.password = await Hash(result.data.password);
 
     try {
         await prisma.user.create({
@@ -31,13 +35,20 @@ export async function action({
             // The .code property can be accessed in a type-safe manner
             if (e.code === 'P2002') {
                 // Replace console log with custom json error (try & reconstruct with same format as zod error)
-                const mssg = 'Email taken'
-                return json({ error: { email: { _errors: [mssg] } } });
+                const mssg = 'Email taken';
+                const blank = '';
+                return json({ 
+                    error: {
+                        name: { _errors: [blank] },
+                        email: { _errors: [mssg] },
+                        password: { _errors: [blank] }
+                    }
+                });
             }
         }
     }
 
-    return redirect("/signup")
+    return redirect("/login");
 }
 
 export default function Signup() {
