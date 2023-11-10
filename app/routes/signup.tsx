@@ -3,11 +3,12 @@ import { prisma } from "~/lib/prisma.server";
 import { Prisma as pris } from "@prisma/client";
 import { z } from "zod";
 import { Form, useActionData } from "@remix-run/react";
+import { Hash } from "~/lib/session.server";
 
 export const signupSchema = z.object({
     name: z.string().min(1).max(8).trim(),
     email: z.string().email().trim(),
-    password: z.string().min(5).max(12).trim()
+    password: z.string().min(8).max(12).trim()
 });
 
 export async function action({
@@ -18,7 +19,6 @@ export async function action({
     const result = await signupSchema.safeParseAsync(body);
 
     if (!result.success) {
-        console.log(result.error.format())
         return json({ error: result.error.format() });
     }
 
@@ -40,8 +40,6 @@ export async function action({
     return redirect("/signup")
 }
 
-
-
 export default function Signup() {
     const data = useActionData<typeof action>();
     // Error complains that its not good with the return for message up above but it works
@@ -51,10 +49,12 @@ export default function Signup() {
                 <input type="name" name="name" id="name" placeholder="  Name" className="border-black ml-2 rounded border" />
                 {data && data.error.name && <p className="ml-2 text-red-600">{data.error.name._errors[0]}</p>}
             </div>
+            <br />
             <div>
                 <input type="email" name="email" id="email" placeholder="  Email" required className="border-black ml-2 rounded border" />
                 {data && data.error.email && <p className="ml-2 text-red-600">{data.error.email._errors[0]}</p>}
             </div>
+            <br />
             <div>
                 <input type="password" name="password" id="password" placeholder="  Password" className="border-black m-2 rounded border" />
                 {data && data.error.password && <p className="ml-2 text-red-600">{data.error.password._errors[0]}</p>}
