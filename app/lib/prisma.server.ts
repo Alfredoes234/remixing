@@ -20,4 +20,17 @@ if (process.env.NODE_ENV === "production") {
     prisma.$connect();
 }
 
-export { prisma };
+async function getUsers(email: string) {
+    const getUser: object | null = await prisma.user.findUnique({
+        where: {
+            email: email,
+        },
+        select: {
+            email: true,
+            password: true,
+        },
+    })
+    return getUser;
+}
+
+export { prisma, getUsers };

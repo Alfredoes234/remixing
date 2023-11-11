@@ -3,7 +3,7 @@ import { prisma } from "~/lib/prisma.server";
 import { Prisma as pris } from "@prisma/client";
 import { z } from "zod";
 import { Form, useActionData } from "@remix-run/react";
-import { Hash } from "~/lib/session.server";
+import { Hash } from "~/lib/cryptography.server";
 
 export const signupSchema = z.object({
     name: z.string().min(1).max(8).trim(),
@@ -36,12 +36,11 @@ export async function action({
             if (e.code === 'P2002') {
                 // Replace console log with custom json error (try & reconstruct with same format as zod error)
                 const mssg = 'Email taken';
-                const blank = '';
                 return json({ 
                     error: {
-                        name: { _errors: [blank] },
+                        name: { _errors: [] },
                         email: { _errors: [mssg] },
-                        password: { _errors: [blank] }
+                        password: { _errors: [] }
                     }
                 });
             }

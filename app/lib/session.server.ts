@@ -1,40 +1,35 @@
-import {  scryptAsync } from '@noble/hashes/scrypt';
-import { bytesToHex as toHex, randomBytes } from '@noble/hashes/utils';
-import { timingSafeEqual } from 'crypto';
+import { createCookieSessionStorage } from "@remix-run/node"; // or cloudflare/deno
 
-async function Hash(password: Uint8Array | string) {
-    const salt = toHex(randomBytes(16));
-    const scr3 = toHex(await scryptAsync(password, salt, {
-        N: 2 ** 16,
-        r: 8,
-        p: 1,
-        dkLen: 32,
-        maxmem: 2 ** 32 + 128 * 8 * 1, // N * r * p * 128 + (128*r*p)
-    }));
-    const hashed = `${salt}:${scr3}`;
-    
-    return hashed;
-}
+type SessionData = {
+    userId: string;
+};
 
-async function Verify(password: string, verify: string) {
-    const [salt, key] = verify.split(':');
-    const hashedBuffer = await scryptAsync(password, salt, {
-        N: 2 ** 16,
-        r: 8,
-        p: 1,
-        dkLen: 32,
-        maxmem: 2 ** 32 + 128 * 8 * 1, // N * r * p * 128 + (128*r*p)
-    });
-    const keyBuffer = Buffer.from(key, 'hex');
-    const match = timingSafeEqual(hashedBuffer, keyBuffer);
-    if (match) {
-        console.log(match)
-        return true;
-    } else {
-        console.log(match)
-        return false;
-    }
-    
-}
+type SessionFlashData = {
+    error: string;
+};
 
-export { Hash, Verify };
+const { getSession, commitSession, destroySession } =
+    createCookieSessionStorage<SessionData, SessionFlashData>(
+        {
+            // a Cookie from `createCookie` or the CookieOptions to create one
+            cookie: {
+                name: "__session",
+
+                // all of these are optional
+                domain: "remix.run",
+                // Expires can also be set (although maxAge overrides it when used in combination).
+                // Note that this method is NOT recommended as `new Date` creates only one date on each server deployment, not a dynamic date in the future!
+                //
+                // expires: new Date(Date.now() + 60_000),
+                httpOnly: true,
+                maxAge: 60,
+                path: "/",
+                sameSite: "lax",
+                secrets: ["s3cret1"],
+                secure: true,
+            },
+        }
+    );
+
+export { getSession, commitSession, destroySession };
+
