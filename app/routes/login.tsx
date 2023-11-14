@@ -4,9 +4,9 @@ import type {
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
-import { Verify } from "~/lib/cryptography.server";
-import { commitSession, getSession } from "~/lib/session.server";
-import { getUsers } from "~/lib/prisma.server";
+import { Verify } from "~/utils/cryptography.server";
+import { commitSession, getSession } from "~/utils/session.server";
+import { getUsers } from "~/utils/prisma.server";
 
 export async function loader({
     request,

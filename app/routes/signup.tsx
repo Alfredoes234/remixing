@@ -1,9 +1,9 @@
 import { redirect, type ActionFunctionArgs, json } from "@remix-run/node";
-import { prisma } from "~/lib/prisma.server";
+import { prisma } from "~/utils/prisma.server";
 import { Prisma as pris } from "@prisma/client";
 import { z } from "zod";
 import { Form, useActionData } from "@remix-run/react";
-import { Hash } from "~/lib/cryptography.server";
+import { Hash } from "~/utils/cryptography.server";
 
 export const signupSchema = z.object({
     name: z.string().min(1).max(8).trim(),
