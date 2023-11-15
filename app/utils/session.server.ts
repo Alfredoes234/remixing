@@ -1,4 +1,5 @@
-import { createCookieSessionStorage } from "@remix-run/node"; // or cloudflare/deno
+import type { DataFunctionArgs } from "@remix-run/node";
+import { createCookieSessionStorage, redirect } from "@remix-run/node";// or cloudflare/deno
 
 type SessionData = {
     userId: string;
@@ -16,7 +17,7 @@ const { getSession, commitSession, destroySession } =
                 name: "__session",
 
                 // all of these are optional
-                domain: "remix.run",
+                domain: "localhost",
                 // Expires can also be set (although maxAge overrides it when used in combination).
                 // Note that this method is NOT recommended as `new Date` creates only one date on each server deployment, not a dynamic date in the future!
                 //
@@ -29,7 +30,24 @@ const { getSession, commitSession, destroySession } =
                 secure: true,
             },
         }
-    );
+);
 
-export { getSession, commitSession, destroySession };
+async function getSessionId({
+    request,
+}: DataFunctionArgs, src: string) {
+    try {
+        const session = await getSession(
+            request.headers.get("Cookie")
+        );
+        if (session.has("userId")) {
+            // Redirect to the home page if they are already signed in.
+            return redirect(src);
+        }
+    } catch (e: any) {
+        return console.log(e);
+    }
+    
+}
+
+export { getSession, commitSession, destroySession, getSessionId };
 

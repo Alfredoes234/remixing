@@ -1,7 +1,7 @@
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 
-import { prisma } from "~/lib/prisma.server";
+import { prisma } from "~/utils/prisma.server";
 
 export async function loader() {
     return json(await prisma.user.findMany());

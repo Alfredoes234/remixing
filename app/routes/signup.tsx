@@ -1,15 +1,39 @@
-import { redirect, type ActionFunctionArgs, json } from "@remix-run/node";
-import { prisma } from "~/lib/prisma.server";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
+import { redirect, json } from "@remix-run/node";
+import { prisma } from "~/utils/prisma.server";
 import { Prisma as pris } from "@prisma/client";
 import { z } from "zod";
 import { Form, useActionData } from "@remix-run/react";
-import { Hash } from "~/lib/cryptography.server";
+import { Hash } from "~/utils/cryptography.server";
+import { commitSession, getSession } from "~/utils/session.server";
 
 export const signupSchema = z.object({
     name: z.string().min(1).max(8).trim(),
     email: z.string().email().trim(),
     password: z.string().min(8).max(12).trim()
 });
+
+export async function loader({
+    request,
+}: LoaderFunctionArgs) {
+
+    const session = await getSession(
+        request.headers.get("Cookie")
+    );
+
+    if (session.has("userId")) {
+        // Redirect to the home page if they are already signed in.
+        return redirect("/");
+    }
+
+    const data = { error: session.get("error") };
+
+    return json(data, {
+        headers: {
+            "Set-Cookie": await commitSession(session),
+        },
+    });
+}
 
 export async function action({
     request,
@@ -36,7 +60,7 @@ export async function action({
             if (e.code === 'P2002') {
                 // Replace console log with custom json error (try & reconstruct with same format as zod error)
                 const mssg = 'Email taken';
-                return json({ 
+                return json({
                     error: {
                         name: { _errors: [] },
                         email: { _errors: [mssg] },

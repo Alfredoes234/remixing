@@ -1,42 +1,44 @@
 import type {
     ActionFunctionArgs,
     LoaderFunctionArgs,
+    MetaFunction,
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
-import { Verify } from "~/lib/cryptography.server";
-import { commitSession, getSession } from "~/lib/session.server";
-import { getUsers } from "~/lib/prisma.server";
+import { Verify } from "~/utils/cryptography.server";
+import { commitSession, getSession} from "~/utils/session.server";
+import { getUsers } from "~/utils/prisma.server";
+
+export const meta: MetaFunction = () => {
+    return [
+        { title: "Remaux" },
+        { name: "description", content: "Login page" },
+    ];
+};
 
 export async function loader({
     request,
 }: LoaderFunctionArgs) {
-
-    const session = await getSession(
-        request.headers.get("Cookie")
-    );
-
-    if (session.has("userId")) {
-        // Redirect to the home page if they are already signed in.
-        return redirect("/");
+    try {
+        const session = await getSession(
+            request.headers.get("Cookie")
+        );
+        if (session.has("userId")) {
+            // Redirect to the home page if they are already signed in.
+            return redirect("/");
+        }
+    } catch (e: any) {
+        return console.log(e);
     }
-
-    const data = { error: session.get("error") };
-
-    return json(data, {
-        headers: {
-            "Set-Cookie": await commitSession(session),
-        },
-    });
 }
 
 
 export async function action({
     request,
 }: ActionFunctionArgs) {
-    //const session = await getSession(
-    //    request.headers.get("Cookie")
-    //);
+    const session = await getSession(
+        request.headers.get("Cookie")
+    );
     const form = await request.formData();
     const email = String(form.get("email"));
     const userData = await getUsers(email);
@@ -53,10 +55,15 @@ export async function action({
             }
         })
     }
+    const userId = { email, password };
 
+    session.set("userId", String(userId));
 
-
-    return redirect("/login");
+    return redirect("/login", {
+        headers: {
+            "Set-Cookie": await commitSession(session),
+        },
+    });
 }
 
 
