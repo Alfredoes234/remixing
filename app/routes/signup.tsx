@@ -5,7 +5,7 @@ import { Prisma as pris } from "@prisma/client";
 import { z } from "zod";
 import { Form, useActionData } from "@remix-run/react";
 import { Hash } from "~/utils/cryptography.server";
-import { commitSession, getSession } from "~/utils/session.server";
+import { getSession } from "~/utils/session.server";
 
 export const signupSchema = z.object({
     name: z.string().min(1).max(8).trim(),
@@ -16,23 +16,18 @@ export const signupSchema = z.object({
 export async function loader({
     request,
 }: LoaderFunctionArgs) {
-
-    const session = await getSession(
-        request.headers.get("Cookie")
-    );
-
-    if (session.has("userId")) {
-        // Redirect to the home page if they are already signed in.
-        return redirect("/");
+    try {
+        const session = await getSession(
+            request.headers.get("Cookie")
+        );
+        if (session.has("userId")) {
+            // Redirect to the home page if they are already signed in.
+            return redirect("/");
+        }
+    } catch (e: any) {
+        return console.log(e);
     }
-
-    const data = { error: session.get("error") };
-
-    return json(data, {
-        headers: {
-            "Set-Cookie": await commitSession(session),
-        },
-    });
+    return null;
 }
 
 export async function action({

@@ -1,20 +1,23 @@
 import { cssBundleHref } from "@remix-run/css-bundle";
-import type { LinksFunction } from "@remix-run/node";
+import { type LinksFunction } from "@remix-run/node";
 import stylesheet from "~/global.css";
 import {
   Links,
   LiveReload,
   Meta,
-  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import Footer from "./components/foot";
+import Header from "./components/head";
 
 export const links: LinksFunction = () => [
   ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
   { rel: "stylesheet", href: stylesheet },
 ];
+
+
 
 export default function App() {
   return (
@@ -26,22 +29,9 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <nav className="flex justify-between m-5">
-          <div>
-            <NavLink to="/" prefetch="intent" className="text-4xl font-bold" >Logo</NavLink>
-          </div>
-          <div className="flex gap-5 text-2xl">
-            <NavLink to="/" prefetch="intent" >cart</NavLink>
-            <NavLink to="/signup" prefetch="intent" >signup</NavLink>
-          </div>
-        </nav>
+        <Header />
         <Outlet />
-        <footer className="bg-gray-400 mt-5 p-5">
-          <p className="text-4xl">WoW</p>
-          <div>
-            <p>Canca</p>
-          </div>
-        </footer>
+        <Footer />
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

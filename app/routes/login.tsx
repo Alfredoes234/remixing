@@ -30,6 +30,7 @@ export async function loader({
     } catch (e: any) {
         return console.log(e);
     }
+    return null;
 }
 
 
