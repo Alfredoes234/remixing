@@ -1,3 +1,4 @@
+# Excluded files from eslint:
 build
 coverage
 public/build
