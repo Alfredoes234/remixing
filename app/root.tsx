@@ -17,8 +17,6 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
 ];
 
-
-
 export default function App() {
   return (
     <html lang="en">

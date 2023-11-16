@@ -1,0 +1,9 @@
+# Ignore artifacts:
+build
+coverage
+public/build
+pnpm-lock.yaml
+/.cache
+/build
+/public/build
+.env
