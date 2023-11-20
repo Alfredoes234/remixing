@@ -31,7 +31,7 @@ export async function action({ request }: ActionFunctionArgs) {
   const form = await request.formData();
   const email = String(form.get("email"));
   const userData = await getUsers(email);
-  const parsed = JSON.parse(JSON.stringify(userData || "") || "");
+  const parsed = JSON.parse(JSON.stringify(userData || ""));
   const password = String(form.get("password"));
   const passwordVerify = await Verify(password, parsed.password);
 
